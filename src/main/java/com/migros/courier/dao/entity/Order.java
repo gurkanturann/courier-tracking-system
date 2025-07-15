@@ -22,4 +22,8 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id")
     private Store sourceStore;
+
+    public OrderStatus getStatus() {
+        return status;
+    }
 }
