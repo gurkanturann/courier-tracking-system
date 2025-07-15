@@ -24,7 +24,6 @@ public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
         System.err.println("Metot Adı: " + method.getName());
         System.err.println("Hata Mesajı: " + ex.getMessage());
 
-        // Hangi olay başarısız oldu?
         if (params.length > 0 && params[0] instanceof CourierLocationEvent event) {
 
             FailedEventLog failedEvent = new FailedEventLog();
@@ -33,7 +32,6 @@ public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
             failedEvent.setFailedAt(LocalDateTime.now());
 
             try {
-                // Olayın kendisini (içindeki kurye bilgisiyle) JSON olarak kaydet.
                 String payload = objectMapper.writeValueAsString(event.getCourier());
                 failedEvent.setEventPayload(payload);
             } catch (JsonProcessingException e) {
