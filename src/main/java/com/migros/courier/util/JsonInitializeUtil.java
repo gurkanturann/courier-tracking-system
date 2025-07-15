@@ -3,15 +3,18 @@ package com.migros.courier.util;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.migros.courier.dao.entity.Courier;
+import com.migros.courier.dao.entity.CourierLocationLog;
 import com.migros.courier.dao.entity.Store;
+import com.migros.courier.dao.repository.CourierLocationLogRepository;
 import com.migros.courier.dao.repository.CourierRepository;
 import com.migros.courier.dao.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.annotations.Comment;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -19,6 +22,7 @@ import java.util.List;
 public class JsonInitializeUtil implements CommandLineRunner {
     private final StoreRepository storeRepository;
     private final CourierRepository courierRepository;
+    private final CourierLocationLogRepository locationLogRepository;
     private final ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public void run(String... args) throws Exception {
@@ -38,6 +42,18 @@ public class JsonInitializeUtil implements CommandLineRunner {
             });
             courierRepository.saveAll(couriers);
             System.out.println(couriers.size() + " adet kurye veritabanına yüklendi.");
+
+            System.out.println("Kuryeler için başlangıç konum logları oluşturuluyor...");
+            List<CourierLocationLog> initialLogs = new ArrayList<>();
+            for (Courier courier : couriers) {
+                CourierLocationLog log = new CourierLocationLog();
+                log.setCourier(courier);
+                log.setLat(courier.getCurrentLat());
+                log.setLng(courier.getCurrentLng());
+                log.setTimestamp(LocalDateTime.now());
+                initialLogs.add(log);
+            }
+            locationLogRepository.saveAll(initialLogs);
         }
 
     }
