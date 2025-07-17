@@ -63,7 +63,7 @@ Uygulama başarıyla başladığında, `http://localhost:8081` adresi üzerinden
 
 1.  **Projeyi Klonlayın:**
     ```bash
-    git clone <projenin-github-linki>
+    git clone <https://github.com/gurkanturann/courier-tracking-system>
     cd courier-tracker
     ```
 

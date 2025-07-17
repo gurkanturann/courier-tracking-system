@@ -21,9 +21,9 @@ public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
 
     @Override
     public void handleUncaughtException(Throwable ex, Method method, Object... params) {
-        log.error("!!! ASENKRON HATA YAKALANDI !!!");
-        log.error("Metot Adı: " + method.getName());
-        log.error("Hata Mesajı: " + ex.getMessage());
+        log.error("!!! ASENKRON EVENT CAUGHT !!!");
+        log.error("Method Name: " + method.getName());
+        log.error("Error Message: " + ex.getMessage());
 
         if (params.length > 0 && params[0] instanceof CourierLocationEvent event) {
 
@@ -36,11 +36,11 @@ public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
                 String payload = objectMapper.writeValueAsString(event.getCourier());
                 failedEvent.setEventPayload(payload);
             } catch (JsonProcessingException e) {
-                failedEvent.setEventPayload("{\"error\": \"Payload serileştirilemedi.\"}");
+                failedEvent.setEventPayload("{\"error\": \"Payload couldn't serialized.\"}");
             }
 
             failedEventLogRepository.save(failedEvent);
-            log.error("Başarısız event veritabanına kaydedildi.");
+            log.error("Failed event saved to db");
         }
     }
 }

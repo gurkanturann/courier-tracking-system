@@ -55,14 +55,14 @@ public class StoreServiceImpl implements StoreService {
                     storeEntranceLog.setStore(store);
                     storeEntranceLog.setEntranceTime(LocalDateTime.now());
                     logRepository.save(storeEntranceLog);
-                    log.info("LOG: Kurye " + courier.getName() + ", mağaza " + store.getName() + " yakınına girdi.");
+                    log.info("LOG: Courier: " + courier.getName() + "approached to store: " + store.getName());
                 }
             }
         }
     }
 
     private List<Store> getStoreCache() {
-        log.info("Mağaza cache'i ilk defa dolduruluyor...");
+        log.info("Stores cache loading...");
         this.storeCache = storeRepository.findAll();
         return this.storeCache;
 

@@ -31,7 +31,7 @@ public class JsonInitializeUtil implements CommandLineRunner {
             InputStream inputStream = TypeReference.class.getResourceAsStream("/store.json");
             List<Store> stores = objectMapper.readValue(inputStream, new TypeReference<List<Store>>() {});
             storeRepository.saveAll(stores);
-            log.info(stores.size() + " adet mağaza veritabanına yüklendi.");
+            log.info(stores.size() + " stores uploaded to db");
         }
 
         if (courierRepository.count() == 0) {
@@ -42,9 +42,9 @@ public class JsonInitializeUtil implements CommandLineRunner {
                 c.setCurrentLng(c.getCurrentLng());
             });
             courierRepository.saveAll(couriers);
-            log.info(couriers.size() + " adet kurye veritabanına yüklendi.");
+            log.info(couriers.size() + " couriers uploaded to db");
 
-            log.info("Kuryeler için başlangıç konum logları oluşturuluyor...");
+            log.info("Couriers starting positions logging...");
             List<CourierLocationLog> initialLogs = new ArrayList<>();
             for (Courier courier : couriers) {
                 CourierLocationLog log = new CourierLocationLog();
