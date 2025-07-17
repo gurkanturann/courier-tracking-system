@@ -22,9 +22,11 @@ Bu proje, bir teknik değerlendirme senaryosu için geliştirilmiş, kuryelerin 
 -   **Konteynerizasyon**: Docker
 
 ### Uygulanan Tasarım Desenleri
+### Uygulanan Tasarım Desenleri
 
-1.  **Observer Pattern (Gözlemci Deseni)**: Servisler arası gevşek bağlılığı (decoupling) sağlamak amacıyla `ApplicationEventPublisher` kullanılmıştır. `CourierService`, bir konum güncellemesi yaptığında bir `CourierLocationEvent` yayınlar. Diğer servisler (`StoreService`, `OrderService`) bu olayı dinleyerek kendi iş mantıklarını tetikler.
-2.  **DTO (Data Transfer Object) Pattern**: API katmanı ile servis katmanı arasında veri taşıma nesneleri kullanılarak, veritabanı entity'leri dış dünyaya kapalı tutulmuş, güvenlik ve esneklik artırılmıştır.
+1.  **Observer Pattern (Gözlemci Deseni)**: Servisler arası gevşek bağlılığı (decoupling) sağlamak amacıyla `ApplicationEventPublisher` kullanılmıştır. `CourierService`, bir konum güncellemesi yaptığında bir `CourierLocationEvent` yayınlar. Diğer servisler (`StoreService`, `OrderService`) bu olayı dinleyerek kendi iş mantıklarını tetikler. Bu sayede servisler birbirlerinin iç işleyişini bilmek zorunda kalmaz.
+
+2.  **Strategy Pattern (Strateji Deseni)**: Mesafe hesaplama mantığı, `DistanceCalculatorService` içinde soyutlanmıştır. Bu servis, iki coğrafi nokta arasındaki mesafeyi hesaplamak için belirli bir **stratejiyi** (bu projede Haversine formülü) uygular. İleride farklı bir mesafe hesaplama algoritması (örneğin, trafik durumuna göre) eklenmek istenirse, sadece bu servisin değiştirilmesi yeterli olacaktır. Bu, ana iş mantığının (örn: `CourierService`) hesaplama detaylarından bağımsız kalmasını sağlar.
 
 ## Kurulum ve Çalıştırma
 
