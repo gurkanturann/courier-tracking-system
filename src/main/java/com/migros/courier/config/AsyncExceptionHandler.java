@@ -6,12 +6,13 @@ import com.migros.courier.dao.entity.FailedEventLog;
 import com.migros.courier.dao.repository.FailedEventLogRepository;
 import com.migros.courier.event.CourierLocationEvent;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.interceptor.AsyncUncaughtExceptionHandler;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
@@ -20,9 +21,9 @@ public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
 
     @Override
     public void handleUncaughtException(Throwable ex, Method method, Object... params) {
-        System.err.println("!!! ASENKRON HATA YAKALANDI !!!");
-        System.err.println("Metot Adı: " + method.getName());
-        System.err.println("Hata Mesajı: " + ex.getMessage());
+        log.error("!!! ASENKRON HATA YAKALANDI !!!");
+        log.error("Metot Adı: " + method.getName());
+        log.error("Hata Mesajı: " + ex.getMessage());
 
         if (params.length > 0 && params[0] instanceof CourierLocationEvent event) {
 
@@ -39,7 +40,7 @@ public class AsyncExceptionHandler implements AsyncUncaughtExceptionHandler {
             }
 
             failedEventLogRepository.save(failedEvent);
-            System.err.println("Başarısız event veritabanına kaydedildi.");
+            log.error("Başarısız event veritabanına kaydedildi.");
         }
     }
 }

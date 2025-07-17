@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  courier-tracker:
+    build: .
+    container_name: courier-tracker-app
+    ports:
+      - "8081:8081"

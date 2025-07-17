@@ -9,6 +9,7 @@ import com.migros.courier.dao.repository.CourierLocationLogRepository;
 import com.migros.courier.dao.repository.CourierRepository;
 import com.migros.courier.dao.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JsonInitializeUtil implements CommandLineRunner {
@@ -30,7 +31,7 @@ public class JsonInitializeUtil implements CommandLineRunner {
             InputStream inputStream = TypeReference.class.getResourceAsStream("/store.json");
             List<Store> stores = objectMapper.readValue(inputStream, new TypeReference<List<Store>>() {});
             storeRepository.saveAll(stores);
-            System.out.println(stores.size() + " adet mağaza veritabanına yüklendi.");
+            log.info(stores.size() + " adet mağaza veritabanına yüklendi.");
         }
 
         if (courierRepository.count() == 0) {
@@ -41,9 +42,9 @@ public class JsonInitializeUtil implements CommandLineRunner {
                 c.setCurrentLng(c.getCurrentLng());
             });
             courierRepository.saveAll(couriers);
-            System.out.println(couriers.size() + " adet kurye veritabanına yüklendi.");
+            log.info(couriers.size() + " adet kurye veritabanına yüklendi.");
 
-            System.out.println("Kuryeler için başlangıç konum logları oluşturuluyor...");
+            log.info("Kuryeler için başlangıç konum logları oluşturuluyor...");
             List<CourierLocationLog> initialLogs = new ArrayList<>();
             for (Courier courier : couriers) {
                 CourierLocationLog log = new CourierLocationLog();

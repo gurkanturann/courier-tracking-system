@@ -1,4 +1,4 @@
-package com.migros.courier.controller.request;
+package com.migros.courier.controller.courier.request;
 
 import lombok.Getter;
 import lombok.Setter;

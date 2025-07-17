@@ -1,5 +1,6 @@
 package com.migros.courier.service.store.impl;
 
+import com.migros.courier.constant.CourierTrackingConstant;
 import com.migros.courier.dao.entity.Courier;
 import com.migros.courier.dao.entity.Store;
 import com.migros.courier.dao.entity.StoreEntranceLog;
@@ -11,6 +12,7 @@ import com.migros.courier.model.dto.StoreDto;
 import com.migros.courier.model.dto.StoreEntranceLogDto;
 import com.migros.courier.service.distance.DistanceCalculatorService;
 import com.migros.courier.service.store.StoreService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -19,22 +21,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
-
+@Slf4j
 @Service
 public class StoreServiceImpl implements StoreService {
-    private static final double ENTRANCE_RADIUS_METERS = 100.0;
-
     private final StoreRepository storeRepository;
     private final StoreEntranceLogRepository logRepository;
     private final DistanceCalculatorService distanceCalculator;
-    private final CourierTrackingMapper mapper;
     private List<Store> storeCache ;
 
-    public StoreServiceImpl(StoreRepository storeRepository, StoreEntranceLogRepository logRepository, DistanceCalculatorService distanceCalculator, CourierTrackingMapper mapper, List<Store> storeCache) {
+    public StoreServiceImpl(StoreRepository storeRepository, StoreEntranceLogRepository logRepository, DistanceCalculatorService distanceCalculator, List<Store> storeCache) {
         this.storeRepository = storeRepository;
         this.logRepository = logRepository;
         this.distanceCalculator = distanceCalculator;
-        this.mapper = mapper;
         this.storeCache = Collections.emptyList();
     }
 
@@ -47,24 +45,24 @@ public class StoreServiceImpl implements StoreService {
             double distance = distanceCalculator.calculateDistance(
                     courier.getCurrentLat(), courier.getCurrentLng(), store.getLat(), store.getLng());
 
-            if (distance <= ENTRANCE_RADIUS_METERS) {
+            if (distance <= CourierTrackingConstant.APPROACH_RADIUS_METERS) {
                 boolean recentlyEntered = logRepository.existsByCourierAndStoreAndEntranceTimeAfter(
-                        courier, store, LocalDateTime.now().minusMinutes(1));
+                        courier, store, LocalDateTime.now().minusMinutes(CourierTrackingConstant.RE_ENTRANCE_COOL_DOWN_MINUTES));
 
                 if (!recentlyEntered) {
-                    StoreEntranceLog log = new StoreEntranceLog();
-                    log.setCourier(courier);
-                    log.setStore(store);
-                    log.setEntranceTime(LocalDateTime.now());
-                    logRepository.save(log);
-                    System.out.println("LOG: Kurye " + courier.getName() + ", mağaza " + store.getName() + " yakınına girdi.");
+                    StoreEntranceLog storeEntranceLog = new StoreEntranceLog();
+                    storeEntranceLog.setCourier(courier);
+                    storeEntranceLog.setStore(store);
+                    storeEntranceLog.setEntranceTime(LocalDateTime.now());
+                    logRepository.save(storeEntranceLog);
+                    log.info("LOG: Kurye " + courier.getName() + ", mağaza " + store.getName() + " yakınına girdi.");
                 }
             }
         }
     }
 
     private List<Store> getStoreCache() {
-        System.out.println("Mağaza cache'i ilk defa dolduruluyor...");
+        log.info("Mağaza cache'i ilk defa dolduruluyor...");
         this.storeCache = storeRepository.findAll();
         return this.storeCache;
 
@@ -81,14 +79,14 @@ public class StoreServiceImpl implements StoreService {
                         distanceCalculator.calculateDistance(s1.getLat(), s1.getLng(), lat, lng),
                         distanceCalculator.calculateDistance(s2.getLat(), s2.getLng(), lat, lng)
                 ))
-                .map(mapper::toStoreDto)
+                .map(CourierTrackingMapper.INSTANCE::toStoreDto)
                 .orElseThrow();
     }
 
     @Transactional(readOnly = true)
     public List<StoreEntranceLogDto> getAllLogs() {
         return logRepository.findAll().stream()
-                .map(mapper::toStoreEntranceLogDto)
+                .map(CourierTrackingMapper.INSTANCE::toStoreEntranceLogDto)
                 .toList();
     }
 }

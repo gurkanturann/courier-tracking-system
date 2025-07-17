@@ -22,6 +22,7 @@ public class Courier {
     private String name;
     private double currentLat;
     private double currentLng;
+    private double totalDistance = 0.0;
     @OneToMany(mappedBy = "assignedCourier", fetch = FetchType.LAZY)
     private List<Order> orders;
     @OneToMany(mappedBy = "courier", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

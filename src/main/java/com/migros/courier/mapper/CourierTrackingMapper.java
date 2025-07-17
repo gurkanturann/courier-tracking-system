@@ -10,9 +10,11 @@ import com.migros.courier.model.dto.StoreDto;
 import com.migros.courier.model.dto.StoreEntranceLogDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring")
 public interface CourierTrackingMapper {
+    CourierTrackingMapper INSTANCE = Mappers.getMapper(CourierTrackingMapper.class);
     CourierDto toCourierDto(Courier courier);
 
     StoreDto toStoreDto(Store store);
