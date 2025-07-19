@@ -1,13 +1,13 @@
 # Courier Tracking Service (Kurye Takip Servisi)
 
-Bu proje, bir teknik değerlendirme senaryosu için geliştirilmiş, kuryelerin anlık coğrafi konumlarını işleyen, belirli iş kurallarına göre aksiyonlar alan ve sipariş atamaları yapan bir Restful web uygulamasıdır. Uygulama, modern Java ve Spring Boot pratikleri kullanılarak tasarlanmış ve Docker ile konteynerize edilmiştir.
+Bu proje, kuryelerin anlık coğrafi konumlarını işleyen, belirli iş kurallarına göre aksiyonlar alan ve sipariş atamaları yapan bir Restful web uygulamasıdır. Uygulama, modern Java ve Spring Boot pratikleri kullanılarak tasarlanmış ve Docker ile konteynerize edilmiştir.
 
 ## Projenin Ana Yetenekleri
 
 -   **Anlık Konum Takibi**: Kuryelerin anlık `(lat, lng)` konumlarını REST API üzerinden alarak işler.
 -   **Mağazaya Giriş Tespiti**: Kuryelerin, sisteme kayıtlı Migros mağazalarının 100 metrelik yarıçapına girdiğini tespit eder ve loglar.
-    -   *İş Kuralı*: Bir kuryenin aynı mağaza yakınına 1 dakika içindeki tekrar girişleri loglanmaz.
--   **Toplam Mesafe Hesaplama**: Her kuryenin katettiği toplam mesafeyi (kuş uçuşu) anlık olarak hesaplar ve sorgulanabilir bir endpoint üzerinden sunar.
+    -   Bir kuryenin aynı mağaza yakınına 1 dakika içindeki tekrar girişleri loglanmaz.
+-   **Toplam Mesafe Hesaplama**: Her kuryenin katettiği toplam mesafeyi anlık olarak hesaplar ve sorgulanabilir bir endpoint üzerinden sunar.
 -   **Akıllı Sipariş Atama**: Yeni bir sipariş geldiğinde, müşterinin konumuna en yakın mağazayı, o mağazaya en yakın ve müsait olan kuryeyi bularak siparişi otomatik olarak atar.
 -   **Güvenilir Asenkron İşleme**: Asenkron işlemlerde (örn: mağazaya giriş tespiti) meydana gelebilecek anlık hatalara karşı, başarısız olan olayları (events) veritabanına kaydedip periyodik olarak yeniden deneyen bir retry mekanizmasına sahiptir.
 
@@ -24,17 +24,15 @@ Bu proje, bir teknik değerlendirme senaryosu için geliştirilmiş, kuryelerin 
 ### Uygulanan Tasarım Desenleri
 ### Uygulanan Tasarım Desenleri
 
-1.  **Observer Pattern (Gözlemci Deseni)**: Servisler arası gevşek bağlılığı (decoupling) sağlamak amacıyla `ApplicationEventPublisher` kullanılmıştır. `CourierService`, bir konum güncellemesi yaptığında bir `CourierLocationEvent` yayınlar. Diğer servisler (`StoreService`, `OrderService`) bu olayı dinleyerek kendi iş mantıklarını tetikler. Bu sayede servisler birbirlerinin iç işleyişini bilmek zorunda kalmaz.
+1.  **Observer Pattern** : Servisler arası gevşek bağlılığı (decoupling) sağlamak amacıyla `ApplicationEventPublisher` kullanılmıştır. `CourierService`, bir konum güncellemesi yaptığında bir `CourierLocationEvent` yayınlar. Diğer servisler (`StoreService`, `OrderService`) bu event'i dinleyerek kendi iş mantıklarını tetikler. Bu sayede servisler birbirlerinin iç işleyişini bilmek zorunda kalmaz.
 
-2.  **Strategy Pattern (Strateji Deseni)**: Mesafe hesaplama mantığı, `DistanceCalculatorService` içinde soyutlanmıştır. Bu servis, iki coğrafi nokta arasındaki mesafeyi hesaplamak için belirli bir **stratejiyi** (bu projede Haversine formülü) uygular. İleride farklı bir mesafe hesaplama algoritması (örneğin, trafik durumuna göre) eklenmek istenirse, sadece bu servisin değiştirilmesi yeterli olacaktır. Bu, ana iş mantığının (örn: `CourierService`) hesaplama detaylarından bağımsız kalmasını sağlar.
+2.  **Strategy Pattern** : Mesafe hesaplama mantığı, `DistanceCalculatorService` içinde soyutlanmıştır. Bu servis, iki coğrafi nokta arasındaki mesafeyi hesaplamak için belirli bir **stratejiyi** (Haversine formülü) uygular. İleride farklı bir mesafe hesaplama algoritması eklenmek istenirse, sadece bu servisin değiştirilmesi yeterli olacaktır. Bu, ana iş mantığının hesaplama detaylarından bağımsız kalmasını sağlar.
 
 ## Kurulum ve Çalıştırma
 
-Projeyi çalıştırmak için iki yöntem bulunmaktadır. **Tavsiye edilen yöntem Docker kullanmaktır.**
+Projeyi çalıştırmak için iki yöntem bulunmaktadır.
 
-### Yöntem 1: Docker ile Çalıştırma (Tavsiye Edilen)
-
-Bu yöntem, bilgisayarınızda Java veya Maven kurulu olmasını gerektirmez. Sadece Docker Desktop yeterlidir.
+### Yöntem 1: Docker ile Çalıştırma 
 
 **Gereksinimler:**
 -   [Docker Desktop](https://www.docker.com/products/docker-desktop/)'ın kurulu ve çalışır durumda olması.
@@ -81,7 +79,7 @@ Uygulama başarıyla başladığında, `http://localhost:8081` adresi üzerinden
 
 ## API Dokümantasyonu ve Test
 
-Uygulama çalışırken, tüm API endpoint'lerini interaktif bir arayüz üzerinden görmek ve test etmek için Swagger UI'ı kullanabilirsiniz.
+Uygulama çalışırken, tüm API endpoint'lerini swagger arayüzü üzerinden görmek ve test etmek için Swagger UI'ı kullanabilirsiniz.
 
 -   **Swagger UI Adresi**: `http://localhost:8081/swagger-ui.html`
 
@@ -100,7 +98,7 @@ Aşağıda projenin ana API endpoint'lerinin bir özeti bulunmaktadır.
 
 #### Örnek İstekler
 
--   **Tüm Kuryeleri Listeleme (Sayfalama ile):**
+-   **Tüm Kuryeleri Listeleme (Pagination):**
     ```http
     GET http://localhost:8081/api/v1/courier?page=0&size=5&sort=name,asc
     ```
