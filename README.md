@@ -5,7 +5,7 @@ Bu proje, kuryelerin anlık coğrafi konumlarını işleyen, belirli iş kuralla
 ## Projenin Ana Yetenekleri
 
 -   **Anlık Konum Takibi**: Kuryelerin anlık `(lat, lng)` konumlarını REST API üzerinden alarak işler.
--   **Mağazaya Giriş Tespiti**: Kuryelerin, sisteme kayıtlı Migros mağazalarının 100 metrelik yarıçapına girdiğini tespit eder ve loglar.
+-   **Mağazaya Giriş Tespiti**: Kuryelerin, sisteme kayıtlı mağazalarının 100 metrelik yarıçapına girdiğini tespit eder ve loglar.
     -   Bir kuryenin aynı mağaza yakınına 1 dakika içindeki tekrar girişleri loglanmaz.
 -   **Toplam Mesafe Hesaplama**: Her kuryenin katettiği toplam mesafeyi anlık olarak hesaplar ve sorgulanabilir bir endpoint üzerinden sunar.
 -   **Akıllı Sipariş Atama**: Yeni bir sipariş geldiğinde, müşterinin konumuna en yakın mağazayı, o mağazaya en yakın ve müsait olan kuryeyi bularak siparişi otomatik olarak atar.
